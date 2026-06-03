@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест-диагностика энергетического состояния</title>
+    <style>
+        :root {
+            --bg-color: #0d0b18;
+            --card-bg: #16122c;
+            --accent-purple: #8a2be2;
+            --neon-blue: #00f0ff;
+            --text-main: #ffffff;
+            --text-muted: #a5a1b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            text-align: center;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .subtitle {
+            color: var(--neon-blue);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .description {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .quiz-box {
+            text-align: left;
+        }
+
+        .question {
+            font-size: 17px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .option-item:hover {
+            background: rgba(138, 43, 226, 0.2);
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--neon-blue));
+            transition: width 0.3s ease;
+        }
+
+        .result-title {
+            font-size: 22px;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+        }
+
+        .result-text {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-purple), #6a1b9a);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.6);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Блок приветствия -->
+    <div id="start-screen">
+        <img src="photo.png" alt="Лара" class="profile-img" onerror="this.src='photo.jpg'; this.onerror=null;">
+        <h1>Лаборатория Энергопрактики</h1>
+        <div class="subtitle">Диагностика состояния</div>
+        <p class="description">
+            Чувствуете постоянный упадок сил, беспричинную тревогу или застой в делах? 
+            Этот экспресс-тест поможет определить уровень истощения вашего энергетического поля 
+            и выявить возможные скрытые блоки.
+        </p>
+        <a href="#" class="cta-btn" onclick="startQuiz(); return false;">Начать диагностику</a>
+    </div>
+
+    <!-- Блок теста -->
+    <div id="quiz-screen" class="hidden">
+        <div class="progress-bar">
+            <div id="progress" class="progress-fill"></div>
+        </div>
+        <div class="quiz-box">
+            <div id="question-text" class="question"></div>
+            <ul id="options-container" class="options-list"></ul>
+        </div>
+    </div>
+
+    <!-- Блок результатов -->
+    <div id="result-screen" class="hidden">
+        <div class="result-title" id="result-headline"></div>
+        <p class="result-text" id="result-desc"></p>
+        <a href="https://t.me/Lara_369" target="_blank" class="cta-btn">Записаться на разбор</a>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            text: "Как вы оцениваете свой уровень сил по утрам после сна?",
+            options: [
+                { text: "Просыпаюсь бодрым и готовым к действиям", score: 0 },
+                { text: "Разбитость проходит только после кофе или душа", score: 1 },
+                { text: "Чувствую себя уставшим сразу после пробуждения", score: 2 }
+            ]
+        },
+        {
+            text: "Замечаете ли вы внезапные перепады настроения или беспричинную тревогу?",
+            options: [
+                { text: "Редко, обычно контролирую свое состояние", score: 0 },
+                { text: "Бывает периодами, списываю на общую усталость", score: 1 },
+                { text: "Постоянно нахожусь в эмоциональном напряжении", score: 2 }
+            ]
+        },
+        {
+            text: "Как обстоят дела в сферах финансов или личных отношений в последнее время?",
+            options: [
+                { text: "Все стабильно или идет в рост", score: 0 },
+                { text: "Появились мелкие досадные препятствия на ровном месте", score: 1 },
+                { text: "Ощущение глухой стены или резкого застоя", score: 2 }
+            ]
+        },
+        {
+            text: "Бывает ли у вас ощущение чужого присутствия или покалывания в теле?",
+            options: [
+                { text: "Нет, никогда с таким не сталкивался", score: 0 },
+                { text: "Изредка бывает легкий озноб или странные предчувствия", score: 1 },
+                { text: "Да, часто чувствую тяжесть в плечах или непонятный дискомфорт", score: 2 }
+            ]
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let totalScore = 0;
+
+    function startQuiz() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = questions[currentQuestionIndex];
+        document.getElementById('question-text').innerText = q.text;
+        
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        
+        q.options.forEach(opt => {
+            const li = document.createElement('li');
+            li.className = 'option-item';
+            li.innerText = opt.text;
+            li.onclick = () => selectOption(opt.score);
+            optionsContainer.appendChild(li);
+        });
+
+        const progressPercent = (currentQuestionIndex / questions.length) * 100;
+        document.getElementById('progress').style.width = progressPercent + '%';
+    }
+
+    function selectOption(score) {
+        totalScore += score;
+        currentQuestionIndex++;
+        
+        if (currentQuestionIndex < questions.length) {
+            showQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        
+        const headline = document.getElementById('result-headline');
+        const desc = document.getElementById('result-desc');
+        
+        if (totalScore <= 2) {
+            headline.innerText = "Энергополе в норме";
+            desc.innerText = "Ваш внутренний баланс стабилен. Незначительные спады связаны с обычной физической усталостью. Достаточно качественного отдыха, чтобы полностью восстановить ресурсы.";
+        } else if (totalScore <= 5) {
+            headline.innerText = "Естественное истощение / Блоки";
+            desc.innerText = "Присутствует накопленный стресс и энергетические просадки. Поле ослаблено, из-за чего могут возникать временные трудности в делах или частая смена настроения. Рекомендуется бережное восстановление.";
+        } else {
+            headline.innerText = "Критический уровень / Внешнее влияние";
+            desc.innerText = "Ваша энергосистема сигнализирует о глубоком дефиците. Подобные симптомы часто указывают на сильные деструктивные привязки, блоки или сторонние воздействия на поле. Требуется детальная диагностика профессионального практика.";
+        }
+    }
+</script>
+
+</body>
+</html>
